@@ -43,40 +43,41 @@ code
 
 #### Requirements:
 
+* R
+* RStudio
+*
+
 R packages:
 ```
-     dyno
-     tidyverse
-     velocyto.R
+     cluster
+     cowplot
      DESeq2
-     Matrix
+     dplyr
+     DT
+     dynamicTreeCut
+     dyno
+     gam
      ggplot2
      ggpubr
-     gam
-     splatter
-     slingshot
-     DT
-     Seurat
-     dplyr
-     ggplot2
+     gridExtra
+     jpeg
+     kableExtra
+     knitr
+     magrittr
+     Matrix
+     metaMA
+     org.Mm.eg.db
      RColorBrewer
      scater
-     scran
-     knitr
-     org.Mm.eg.db
-     cluster
-     dynamicTreeCut
      SCORPIUS
-     ggpubr
-     magrittr
-     metaMA
-     VennDiagram
-     jpeg
+     scran
+     Seurat
+     slingshot
+     splatter
+     tidyverse
      tiff
-     cowplot
-     gridExtra
-     knitr
-     kableExtra
+     velocyto.R
+     VennDiagram
 ```
 
 
@@ -92,7 +93,7 @@ R packages:
 > Refer the Rmarkdown file - 2_PCA_Markers_Figure_2.Rmd
 
 
-#### 3. Gene expression by individual selection of known Cd4 and Cd8a co-receptor gene expression status (Figure 4)
+#### 3. Gene expression by individual selection of known Cd4 and Cd8a co-receptor gene expression status (Figure 4, Sup Figure 2a, and Sup Figure 5)
 
 > Refer the Rmarkdown file - 3_Heatmap_Figure_4.Rmd
 
