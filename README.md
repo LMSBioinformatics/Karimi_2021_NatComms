@@ -35,7 +35,12 @@ Read counts for genes were calculated using velocyto version 0.17 (La Manno et a
 
 ```
 
-code
+velocyto run_smartseq2 \
+	-d 1 \
+	`find </path/to/aligned/bam/files> -name "*.bam" -print` \
+	</path/to/mm10/genes.gtf> \
+	-o </path/to/directory/velocyto-output>
+
 
 ```
 
@@ -95,7 +100,6 @@ code
 #### 3. Gene expression by individual selection of known Cd4 and Cd8a co-receptor gene expression status (Figure 4, Sup Figure 2a, and Sup Figure 5)
 
 > Refer the Rmarkdown file - 3_Heatmap_Figure_4.Rmd
-
 
 
 #### 4. Gene expression programs associated with distinct patterns of co-receptor gene activity in selection intermediates (Figure 5)
