@@ -35,9 +35,49 @@ code
 
 ### Analysis
 
+#### Requirements:
+
+R packages:
+```
+     dyno
+     tidyverse
+     velocyto.R
+     DESeq2
+     Matrix
+     ggplot2
+     ggpubr
+     gam
+     splatter
+     slingshot
+     DT
+     Seurat
+     dplyr
+     ggplot2
+     RColorBrewer
+     scater
+     scran
+     knitr
+     org.Mm.eg.db
+     cluster
+     dynamicTreeCut
+     SCORPIUS
+     ggpubr
+     magrittr
+     metaMA
+     VennDiagram
+     jpeg
+     tiff
+     cowplot
+     gridExtra
+     knitr
+     kableExtra
+```
+
+
+
 #### 1. PCA analysis of scRNA-seq data positions selection intermediates between pre-selection and post-selection thymocytes (Figure 1)
 
-Refer the Rmarkdown file - 1_PCA_Figure_1.Rmd
+> Refer the Rmarkdown file - 1_PCA_Figure_1.Rmd
 
 <description>
 
