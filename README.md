@@ -3,9 +3,9 @@
 This repository contains scripts used in the analysis of single-cell RNA-seq data generated using Smart-seq2 and SMARTer protocols from mouse thymocytes to study the order and logic of CD4 CD8 lineage choice and differentiation.
 
 
-- [Alignment](###alignment)
-- [Quantification](###quantification)
-- [Analysis](###analysis)
+- [Alignment](#alignment)
+- [Quantification](#quantification)
+- [Analysis](#analysis)
 
 
 
