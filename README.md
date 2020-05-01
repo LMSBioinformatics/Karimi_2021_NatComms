@@ -20,7 +20,7 @@ tophat2 \
 	--library-type=fr-firststrand \
 	-p <num_of_threads> \
 	-o </path/to/output/directory>/<sample_name> \
-	/path/to/mm10_genome_index/Sequence/Bowtie2Index/genome \
+	</path/to/mm10_genome_index/Sequence/Bowtie2Index/genome> \
 	</path/to/fastq/directory>/<sample_name>_R1.fastq.gz \
 	</path/to/fastq/directory>/<sample_name>_R2.fastq.gz
 
