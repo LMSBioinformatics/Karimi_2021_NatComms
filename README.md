@@ -45,9 +45,8 @@ code
 
 * R
 * RStudio
-*
+* R packages:
 
-R packages:
 ```
      cluster
      cowplot
@@ -113,8 +112,8 @@ R packages:
 > Refer the Rmarkdown file - 6_Temporal_Sequence_TrajectoryAnalysis_Figure_7.Rmd
 
 
-#### 7. Identifying gene sets
+#### 7. Identifying gene sets - F-set
 
-> Refer the Rmarkdown file - 7_genesets_identification.Rmd
+> Refer the R script - 7_F-set_identification.R
 
 #### Supplementary Analysis and figures
