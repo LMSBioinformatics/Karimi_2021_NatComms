@@ -85,39 +85,65 @@ velocyto run_smartseq2 \
 ```
 
 
+#### Figure 1: PCA analysis of scRNA-seq data positions selection intermediates between pre-selection and post-selection thymocytes
 
-#### 1. PCA analysis of scRNA-seq data positions selection intermediates between pre-selection and post-selection thymocytes (Figure 1)
+> a and b - Refer Figure1.Rmd and [Figure1.html](#Figure1.html)
 
-> Refer the Rmarkdown file - 1_PCA_Figure_1.Rmd
+#### Figure 2: scRNA-seq captures maturation, activation, and lineage identity as principal components of CD4/CD8 lineage choice and differentiation
 
-<description>
-
-#### 2. scRNA-seq captures maturation, activation, and lineage identity as principal components of CD4/CD8 lineage choice and differentiation (Figure 2)
-
-> Refer the Rmarkdown file - 2_PCA_Markers_Figure_2.Rmd
+> a, b and c - Refer Figure2_Figure6ab_SupFigure2bcde.Rmd and Figure2_Figure6ab_SupFigure2bcde.html
 
 
-#### 3. Gene expression by individual selection of known Cd4 and Cd8a co-receptor gene expression status (Figure 4, Sup Figure 2a, and Sup Figure 5)
+#### Figure 4: Gene expression by individual selection of known Cd4 and Cd8a co-receptor gene expression status
 
-> Refer the Rmarkdown file - 3_Heatmap_Figure_4.Rmd
-
-
-#### 4. Gene expression programs associated with distinct patterns of co-receptor gene activity in selection intermediates (Figure 5)
-
-> Refer the Rmarkdown file - 4_CoReceptor_GeneExpression_Figure_5.Rmd
+> a - Refer Figure4_SupFigure2a_SupFigure5.Rmd and Figure4_SupFigure2a_SupFigure5.html
 
 
-#### 5. CD4 and CD8 lineage characteristics are established at different times during CD4/CD8 lineage choice and differentiation (Figure 6)
 
-> Refer the Rmarkdown file - 5_Lineage_Characteristics_Figure_6.Rmd
+#### Figure 5: Gene expression programs associated with distinct patterns of co-receptor gene activity in selection intermediates
 
-#### 6. The temporal sequence of co-receptor gene expression by selection intermediates (Figure 7)
-
-> Refer the Rmarkdown file - 6_Temporal_Sequence_TrajectoryAnalysis_Figure_7.Rmd
+> a, c, d and f - Refer Figure5acdf_Figure6cd_SupFigure9b.Rmd and Figure5acdf_Figure6cd_SupFigure9b.html
+> b and e - Refer Figure5be_SupFigure9c_SupFigure11.Rmd and Figure5be_SupFigure9c_SupFigure11.html
 
 
-#### 7. Identifying gene sets - F-set
 
-> Refer the R script - 7_F-set_identification.R
+#### Figure 6: CD4 and CD8 lineage characteristics are established at different times during CD4/CD8 lineage choice and differentiation
+
+> a and b - Refer Figure2_Figure6ab_SupFigure2bcde.Rmd and Figure2_Figure6ab_SupFigure2bcde.html
+> c and d - Refer Figure5acdf_Figure6cd_SupFigure9b.Rmd and Figure5acdf_Figure6cd_SupFigure9b.html
+
+
+#### Figure 7: The temporal sequence of co-receptor gene expression by selection intermediates
+
+> a and b - Refer Figure7ab.Rmd and Figure7ab.html
+> e - Refer Figure7e.Rmd and Figure7e.html
+> g - Refer Figure7g.Rmd and Figure7g.html
+
+
+#### Identifying gene sets - F-set
+
+> Refer the R script - F-set_identification.R
 
 #### Supplementary Analysis and figures
+
+#### Supplementary Figure 2: Key genes and correlations
+
+> a - Refer Figure4_SupFigure2a_SupFigure5.html and  Figure4_SupFigure2a_SupFigure5.Rmd
+> b, c, d and e - Refer Figure2_Figure6ab_SupFigure2bcde.Rmd and Figure2_Figure6ab_SupFigure2bcde.html
+
+
+#### Supplementary Figure 5: Gene expression by individual selection intermediates in MHC class II-/- thymus.  
+
+> a - Refer Figure4_SupFigure2a_SupFigure5.Rmd and Figure4_SupFigure2a_SupFigure5.html
+
+
+#### Supplementary Figure 9. The temporal sequence of pre- and post-selection MHC class II-/- thymocytes and selection intermediates
+
+> b - Refer Figure5acdf_Figure6cd_SupFigure9b.Rmd and
+Figure5acdf_Figure6cd_SupFigure9b.html
+> c - Refer Figure5be_SupFigure9c_SupFigure11.Rmd and Figure5be_SupFigure9c_SupFigure11.html
+
+
+#### Supplementary Figure 11. Cd4+ Cd8a- selection intermediates with NKT-like gene expression do not account for the timing of co-receptor gene expression patterns in the MHC class II-/- thymus
+
+> a and b - Refer Figure5be_SupFigure9c_SupFigure11.Rmd and Figure5be_SupFigure9c_SupFigure11.html Also, refer SupFigure11.Rmd and SupFigure11.html
