@@ -87,7 +87,7 @@ velocyto run_smartseq2 \
 
 #### Figure 1: PCA analysis of scRNA-seq data positions selection intermediates between pre-selection and post-selection thymocytes
 
-> a and b - Refer [Figure1.Rmd](blob/master/Figure1.Rmd) and [Figure1.html](blob/master/Figure1.html)
+> a and b - Refer [Figure1.Rmd](Figure1.Rmd) and [Figure1.html](Figure1.html)
 
 #### Figure 2: scRNA-seq captures maturation, activation, and lineage identity as principal components of CD4/CD8 lineage choice and differentiation
 
