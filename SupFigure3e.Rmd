@@ -1,0 +1,465 @@
+---
+title: "Sep Figure 3.e"
+author: "Mehdi Karimi"
+date: "30/04/2020"
+output: 
+  html_document:
+    code_folding: hide
+    highlight: zenburn
+    number_sections: yes
+    theme: yeti
+    toc: yes
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dyno)
+library(tidyverse)
+library(velocyto.R)
+library(DESeq2)
+library("Matrix")
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(ggpubr))
+library(gam)
+library(splatter)
+library(slingshot)
+library(DT)
+library(Seurat)
+library(dplyr)
+library(ggplot2)
+library(RColorBrewer)
+library(scater)
+library(scran)
+library(knitr)
+library(org.Mm.eg.db)
+library(cluster)
+library(dynamicTreeCut)
+library(SCORPIUS)
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(ggpubr))
+suppressPackageStartupMessages(library(magrittr))
+suppressPackageStartupMessages(library(metaMA))
+suppressPackageStartupMessages(library(DT))
+library(VennDiagram)
+library("jpeg")
+library("tiff")
+library(ggplot2)
+library(cowplot)
+library(gridExtra)
+library(knitr)
+library(kableExtra)
+```
+
+```{r,echo=T, eval=T, cache=T, message=F, warning=FALSE}
+
+####################
+# Loading new data scRNAseq_CRG_02012020 (rep2)
+####################
+
+ldat_new <- read.loom.matrices("/Volumes/bioinfomatics$/Mehdi/Matthias/scRNA-seq/scRNAseq_CRG_02012020/onefilepercell_HFWL7BBXY_1_IDT-DUI-NXT-66_and_others_0VWWZ.loom")
+
+ldat_new <- lapply(ldat_new,function(x) {
+  colnames(x) <-  gsub(".bam","",gsub("onefilepercell_HFWL7BBXY_1_IDT-DUI-NXT-66_and_others_0VWWZ:","",colnames(x)))
+  x
+})
+
+meta_data <- read.csv(file="/Volumes/bioinfomatics$/Mehdi/Matthias/scRNA-seq/scRNAseq_CRG_02012020/sample_info.csv", header=TRUE, sep=",")
+# meta_data <- meta_data[grep('WT',meta_data$sample_label),]
+rownames(meta_data) <- meta_data$sample_ID
+meta_data$rep <- 'rep2'
+meta_data <- meta_data[,c('rep','sample_label')]
+colnames(meta_data) <- c('rep','celltype')
+meta_data$celltype <- gsub('TCRint_DP_WT','TCRhiDP',gsub('CD8_SP_TCRpos_WT','CD8SP',gsub("CD4_SP_WT","CD4SP",gsub("CD4_pos_8lo_WT","CD4+8low",gsub("CD69_pos_DP_WT","CD69posDP",gsub("CD69_neg_DP_WT","CD69negDP",meta_data$celltype))))))
+
+
+meta_data$celltype <- gsub('TCRint_DP_MHCclassII_KO','TCRhiDP_C2KO',gsub('CD8_SP_TCRpos_MHCclassII_KO','CD8SP_C2KO',gsub("CD4_SP_MHCclassII_KO","CD4SP_C2KO",gsub("CD4_pos_8lo_classII_KO","CD4+8low_C2KO",gsub("CD69_pos_DP_MHCclassII_KO","CD69posDP_C2KO",gsub("CD69_neg_DP_MHCclassII_KO","CD69negDP_C2KO",meta_data$celltype))))))
+
+meta_data <- meta_data[!(rownames(meta_data)=="HFWL7BBXY_1_IDT-DUI-NXT-49" | rownames(meta_data)=="HFWL7BBXY_1_IDT-DUI-NXT-333"),]
+meta_data[grep('C2KO',meta_data$celltype),]$rep <- 'rep2_KO'
+meta_data$celltype <- gsub('_C2KO','', meta_data$celltype)
+
+
+# exonic read (spliced) expression matrix
+emat_rep2 <- ldat_new$spliced
+emat_rep2 <- emat_rep2[, colnames(emat_rep2) %in% as.vector(rownames(meta_data))];
+
+
+# intronic read (unspliced) expression matrix
+nmat_rep2 <- ldat_new$unspliced
+nmat_rep2 <- nmat_rep2[, colnames(nmat_rep2) %in% as.vector(rownames(meta_data))];
+
+# spanning read (intron+exon) expression matrix
+smat_rep2 <- ldat_new$spanning;
+smat_rep2 <- smat_rep2[, colnames(smat_rep2) %in% as.vector(rownames(meta_data))];
+
+
+
+
+######################
+# Data loading (rep1)
+######################
+
+ldat <- read.loom.matrices("/Volumes/bioinfomatics$/Mehdi/Matthias/scRNA-seq/onefilepercell_P2221_N707-S505_and_others_96WOS.loom")
+
+ldat <- lapply(ldat,function(x) {
+  colnames(x) <-  gsub(".bam","",gsub(".*:","",colnames(x)))
+  x
+})
+
+WishBone_tsne <- read.csv(file="/Volumes/bioinfomatics$/Mehdi/Matthias/scRNA-seq/WishBone_tsne_with_highTCR.csv", header=TRUE, sep=",")
+colnames(WishBone_tsne) <- c('CellName','x','y','Sample')
+
+colData <- read.csv(file="/Volumes/bioinfomatics$/Mehdi/Matthias/scRNA-seq/colData.csv", header=TRUE, sep=",")
+
+merged_meta1 <- merge(x = WishBone_tsne, y = colData, by = "CellName")
+color_dt <- data.frame(Sample.x=c('WT1','WT2','WT3','WT4','WT5','highTCR_Rest'), color=c('#f44e42','#ffac38','#bcff37','#36eeff','#9335ff','#36ffee'))
+merged_meta <- merge(x = merged_meta1, y = color_dt, by = "Sample.x")
+merged_meta <- merged_meta[,c('CellCode','Sample.x')]
+rownames(merged_meta) <- merged_meta$CellCode
+merged_meta$rep <- 'rep1'
+merged_meta <- merged_meta[,c('rep','Sample.x')]
+colnames(merged_meta) <- c('rep','celltype')
+merged_meta$celltype <- gsub('highTCR_Rest','TCRhiDP',gsub('WT5','CD8SP',gsub("WT4","CD4SP",gsub("WT3","CD4+8low",gsub("WT2","CD69posDP",gsub("WT1","CD69negDP",merged_meta$celltype))))))
+
+# exonic read (spliced) expression matrix
+emat_rep1 <- ldat$spliced
+colnames(emat_rep1) <- gsub("-","_",colnames(emat_rep1))
+emat_rep1 <- emat_rep1[, colnames(emat_rep1) %in% as.vector(rownames(merged_meta))];
+
+
+# intronic read (unspliced) expression matrix
+nmat_rep1 <- ldat$unspliced
+colnames(nmat_rep1) <- gsub("-","_",colnames(nmat_rep1))
+nmat_rep1 <- nmat_rep1[, colnames(nmat_rep1) %in% as.vector(rownames(merged_meta))];
+
+# spanning read (intron+exon) expression matrix
+smat_rep1 <- ldat$spanning;
+colnames(smat_rep1) <- gsub("-","_",colnames(smat_rep1))
+smat_rep1 <- smat_rep1[, colnames(smat_rep1) %in% as.vector(rownames(merged_meta))];
+
+
+############
+#merging rep1 & rep2#
+############
+
+emat <- cbind(emat_rep1,emat_rep2)
+nmat <- cbind(nmat_rep1,nmat_rep2)
+smat <- cbind(smat_rep1,smat_rep2)
+meta_info <- rbind(merged_meta,meta_data)
+
+
+###########
+#Running Seurat 
+###########
+
+WT_Thymocye <- CreateSeuratObject(emat, meta.data = meta_info)
+WT_Thymocye.list <- SplitObject(WT_Thymocye, split.by = "rep")
+
+for (i in 1:length(WT_Thymocye.list)) {
+    WT_Thymocye.list[[i]] <- NormalizeData(WT_Thymocye.list[[i]], verbose = FALSE)
+    WT_Thymocye.list[[i]] <- FindVariableFeatures(WT_Thymocye.list[[i]], selection.method = "vst", 
+        nfeatures = 2000, verbose = FALSE)
+}
+
+Rep1_log <- t(GetAssayData(WT_Thymocye.list[[1]],slot='data',assay = "RNA"))
+Rep2_log <- t(GetAssayData(WT_Thymocye.list[[3]],slot='data',assay = "RNA"))
+Rep2KO_log <- t(GetAssayData(WT_Thymocye.list[[2]],slot='data',assay = "RNA"))
+
+meta_info$x1 <- 'Others'
+meta_info$x2 <- 'Others'
+meta_info$x3 <- 'Others'
+meta_info$x4 <- 'Others'
+meta_info$x5 <- 'Cd8-'
+meta_info$x6 <- 'Cd4-'
+meta_info$x7 <- 'Itm2a-'
+meta_info$x8 <- 'Stat1-'
+
+meta_info$x9 <- 'Others'
+# meta_info$x10 <- 'Others'
+# meta_info$x11 <- 'Others'
+# meta_info$x12 <- 'Others'
+
+colnames(meta_info) <- c("rep", "celltype", "Cd4+Cd8+","Cd4+Cd8-", "Cd4-Cd8+", "Cd4-Cd8-", 'Cd8', 'Cd4', 'Itm2a', 'Stat1', "Zbtb7b+Runx3+") 
+
+
+meta_info[rownames(Rep1_log[Rep1_log[,'Zbtb7b'] > 0.1 & Rep1_log[,'Runx3'] > 0.1,]),'Zbtb7b+Runx3+'] <- 'Zbtb7b+Runx3+'
+meta_info[rownames(Rep2_log[Rep2_log[,'Zbtb7b'] > 0.1 & Rep2_log[,'Runx3'] > 0.1,]),'Zbtb7b+Runx3+'] <- 'Zbtb7b+Runx3+'
+meta_info[rownames(Rep2KO_log[Rep2KO_log[,'Zbtb7b'] > 0.1 & Rep2KO_log[,'Runx3'] > 0.1,]),'Zbtb7b+Runx3+'] <- 'Zbtb7b+Runx3+'
+
+# meta_info[rownames(Rep1_log[Rep1_log[,'Zbtb7b'] > 0.1 & Rep1_log[,'Runx3'] < 0.1,]),'Zbtb7b+Runx3-'] <- 'Zbtb7b+Runx3-'
+# meta_info[rownames(Rep2_log[Rep2_log[,'Zbtb7b'] > 0.1 & Rep2_log[,'Runx3'] < 0.1,]),'Zbtb7b+Runx3-'] <- 'Zbtb7b+Runx3-'
+# meta_info[rownames(Rep2KO_log[Rep2KO_log[,'Zbtb7b'] > 0.1 & Rep2KO_log[,'Runx3'] < 0.1,]),'Zbtb7b+Runx3-'] <- 'Zbtb7b+Runx3-'
+# 
+# meta_info[rownames(Rep1_log[Rep1_log[,'Zbtb7b'] < 0.1 & Rep1_log[,'Runx3'] > 0.1,]),'Zbtb7b-Runx3+'] <- 'Zbtb7b-Runx3+'
+# meta_info[rownames(Rep2_log[Rep2_log[,'Zbtb7b'] < 0.1 & Rep2_log[,'Runx3'] > 0.1,]),'Zbtb7b-Runx3+'] <- 'Zbtb7b-Runx3+'
+# meta_info[rownames(Rep2KO_log[Rep2KO_log[,'Zbtb7b'] < 0.1 & Rep2KO_log[,'Runx3'] > 0.1,]),'Zbtb7b-Runx3+'] <- 'Zbtb7b-Runx3+'
+# 
+# meta_info[rownames(Rep1_log[Rep1_log[,'Zbtb7b'] < 0.1 & Rep1_log[,'Runx3'] < 0.1,]),'Zbtb7b-Runx3-'] <- 'Zbtb7b-Runx3-'
+# meta_info[rownames(Rep2_log[Rep2_log[,'Zbtb7b'] < 0.1 & Rep2_log[,'Runx3'] < 0.1,]),'Zbtb7b-Runx3-'] <- 'Zbtb7b-Runx3-'
+# meta_info[rownames(Rep2KO_log[Rep2KO_log[,'Zbtb7b'] < 0.1 & Rep2KO_log[,'Runx3'] < 0.1,]),'Zbtb7b-Runx3-'] <- 'Zbtb7b-Runx3-'
+
+
+meta_info[rownames(Rep1_log[Rep1_log[,'Cd4'] > 0.1 & Rep1_log[,'Cd8a'] > 0.1,]),'Cd4+Cd8+'] <- 'Cd4+Cd8+'
+meta_info[rownames(Rep2_log[Rep2_log[,'Cd4'] > 0.1 & Rep2_log[,'Cd8a'] > 0.1,]),'Cd4+Cd8+'] <- 'Cd4+Cd8+'
+meta_info[rownames(Rep2KO_log[Rep2KO_log[,'Cd4'] > 0.1 & Rep2KO_log[,'Cd8a'] > 0.1,]),'Cd4+Cd8+'] <- 'Cd4+Cd8+'
+
+meta_info[rownames(Rep1_log[Rep1_log[,'Cd4'] > 0.1 & Rep1_log[,'Cd8a'] < 0.1,]),'Cd4+Cd8-'] <- 'Cd4+Cd8-'
+meta_info[rownames(Rep2_log[Rep2_log[,'Cd4'] > 0.1 & Rep2_log[,'Cd8a'] < 0.1,]),'Cd4+Cd8-'] <- 'Cd4+Cd8-'
+meta_info[rownames(Rep2KO_log[Rep2KO_log[,'Cd4'] > 0.1 & Rep2KO_log[,'Cd8a'] < 0.1,]),'Cd4+Cd8-'] <- 'Cd4+Cd8-'
+
+meta_info[rownames(Rep1_log[Rep1_log[,'Cd4'] < 0.1 & Rep1_log[,'Cd8a'] > 0.1,]),'Cd4-Cd8+'] <- 'Cd4-Cd8+'
+meta_info[rownames(Rep2_log[Rep2_log[,'Cd4'] < 0.1 & Rep2_log[,'Cd8a'] > 0.1,]),'Cd4-Cd8+'] <- 'Cd4-Cd8+'
+meta_info[rownames(Rep2KO_log[Rep2KO_log[,'Cd4'] < 0.1 & Rep2KO_log[,'Cd8a'] > 0.1,]),'Cd4-Cd8+'] <- 'Cd4-Cd8+'
+
+meta_info[rownames(Rep1_log[Rep1_log[,'Cd4'] < 0.1 & Rep1_log[,'Cd8a'] < 0.1,]),'Cd4-Cd8-'] <- 'Cd4-Cd8-'
+meta_info[rownames(Rep2_log[Rep2_log[,'Cd4'] < 0.1 & Rep2_log[,'Cd8a'] < 0.1,]),'Cd4-Cd8-'] <- 'Cd4-Cd8-'
+meta_info[rownames(Rep2KO_log[Rep2KO_log[,'Cd4'] < 0.1 & Rep2KO_log[,'Cd8a'] < 0.1,]),'Cd4-Cd8-'] <- 'Cd4-Cd8-'
+
+meta_info[rownames(Rep1_log[Rep1_log[,'Cd8a'] > 0.1,]),'Cd8'] <- 'Cd8+'
+meta_info[rownames(Rep2_log[Rep2_log[,'Cd8a'] > 0.1,]),'Cd8'] <- 'Cd8+'
+meta_info[rownames(Rep2KO_log[Rep2KO_log[,'Cd8a'] > 0.1,]),'Cd8'] <- 'Cd8+'
+
+meta_info[rownames(Rep1_log[Rep1_log[,'Cd4'] > 0.1,]),'Cd4'] <- 'Cd4+'
+meta_info[rownames(Rep2_log[Rep2_log[,'Cd4'] > 0.1,]),'Cd4'] <- 'Cd4+'
+meta_info[rownames(Rep2KO_log[Rep2KO_log[,'Cd4'] > 0.1,]),'Cd4'] <- 'Cd4+'
+
+meta_info[rownames(Rep1_log[Rep1_log[,'Itm2a'] > 0.5,]),'Itm2a'] <- 'Itm2a+'
+meta_info[rownames(Rep2_log[Rep2_log[,'Itm2a'] > 0.5,]),'Itm2a'] <- 'Itm2a+'
+meta_info[rownames(Rep2KO_log[Rep2KO_log[,'Itm2a'] > 0.1,]),'Itm2a'] <- 'Itm2a+'
+
+meta_info[rownames(Rep1_log[Rep1_log[,'Stat1'] > 0.2,]),'Stat1'] <- 'Stat1+'
+meta_info[rownames(Rep2_log[Rep2_log[,'Stat1'] > 0.2,]),'Stat1'] <- 'Stat1+'
+meta_info[rownames(Rep2KO_log[Rep2KO_log[,'Stat1'] > 0.1,]),'Stat1'] <- 'Stat1+'
+
+meta_info[meta_info$celltype=='CD4SP' & meta_info$Itm2a=='Itm2a+' & meta_info$Stat1=='Stat1-', 'celltype'] <- 'CD4SP_Immature'
+meta_info[meta_info$celltype=='CD4SP' & (meta_info$Itm2a=='Itm2a-' | meta_info$Stat1=='Stat1+'), 'celltype'] <- 'CD4SP_Mature'
+
+
+WT_Thymocye <- CreateSeuratObject(emat, meta.data = meta_info)
+WT_Thymocye.list <- SplitObject(WT_Thymocye, split.by = "rep")
+
+for (i in 1:length(WT_Thymocye.list)) {
+    WT_Thymocye.list[[i]] <- NormalizeData(WT_Thymocye.list[[i]], verbose = FALSE)
+    WT_Thymocye.list[[i]] <- FindVariableFeatures(WT_Thymocye.list[[i]], selection.method = "vst", 
+        nfeatures = 2000, verbose = FALSE)
+}
+
+meta_info <- WT_Thymocye@meta.data
+
+reference.list <- WT_Thymocye.list[c("rep1", "rep2","rep2_KO")]
+WT_Thymocye.anchors <- FindIntegrationAnchors(object.list = reference.list, dims = 1:30)
+
+WT_Thymocye.integrated <- IntegrateData(anchorset = WT_Thymocye.anchors, dims = 1:30)
+
+
+library(ggplot2)
+library(cowplot)
+# switch to integrated assay. The variable features of this assay are automatically
+# set during IntegrateData
+DefaultAssay(WT_Thymocye.integrated) <- "integrated"
+
+# Run the standard workflow for visualization and clustering
+WT_Thymocye.integrated <- ScaleData(WT_Thymocye.integrated, verbose = FALSE)
+WT_Thymocye.integrated <- RunPCA(WT_Thymocye.integrated, npcs = 30, verbose = FALSE)
+WT_Thymocye.integrated <- RunUMAP(WT_Thymocye.integrated, reduction = "pca", dims = 1:30)
+
+gene_set <- read.csv(file="/Volumes/bioinfomatics$/Mehdi/Matthias/scRNA-seq/scRNAseq_CRG_02012020/gene_set/DE_gene_drodeRes_rep2_fset.csv", header=FALSE, sep=",")
+
+emat <- cbind(emat_rep1,emat_rep2)
+nmat <- cbind(nmat_rep1,nmat_rep2)
+smat <- cbind(smat_rep1,smat_rep2)
+# meta_info <- rbind(merged_meta,meta_data)
+
+emat <- emat[intersect(gene_set$V1,rownames(emat)),]
+emat <- emat[!(rownames(emat) =='Cd4' | rownames(emat) == 'Cd8a' | rownames(emat) =='Cd8b1'),]
+
+###########
+#Running Seurat 
+###########
+
+WT_Thymocye <- CreateSeuratObject(emat, meta.data = meta_info)
+WT_Thymocye.list <- SplitObject(WT_Thymocye, split.by = "rep")
+
+for (i in 1:length(WT_Thymocye.list)) {
+    WT_Thymocye.list[[i]] <- NormalizeData(WT_Thymocye.list[[i]], verbose = FALSE)
+    WT_Thymocye.list[[i]] <- FindVariableFeatures(WT_Thymocye.list[[i]], selection.method = "vst", 
+        nfeatures = 2000, verbose = FALSE)
+}
+
+reference.list <- WT_Thymocye.list[c("rep1", "rep2","rep2_KO")]
+WT_Thymocye.anchors <- FindIntegrationAnchors(object.list = reference.list, dims = 1:30)
+
+WT_Thymocye.integrated <- IntegrateData(anchorset = WT_Thymocye.anchors, dims = 1:30)
+
+
+library(ggplot2)
+library(cowplot)
+# switch to integrated assay. The variable features of this assay are automatically
+# set during IntegrateData
+DefaultAssay(WT_Thymocye.integrated) <- "integrated"
+
+# Run the standard workflow for visualization and clustering
+WT_Thymocye.integrated <- ScaleData(WT_Thymocye.integrated, verbose = FALSE)
+WT_Thymocye.integrated <- RunPCA(WT_Thymocye.integrated, npcs = 30, verbose = FALSE)
+WT_Thymocye.integrated <- RunUMAP(WT_Thymocye.integrated, reduction = "pca", dims = 1:30)
+
+Rep1_filtered_rep2 <- subset(WT_Thymocye.integrated, cells = rownames(meta_info[meta_info$rep=='rep1' |
+         (meta_info$rep=='rep2_KO' & meta_info$celltype=='CD69posDP' & meta_info$nCount_RNA < 1500000 & meta_info$nCount_RNA > 750000) |
+         (meta_info$rep=='rep2_KO' & meta_info$celltype!='CD69posDP' & meta_info$nCount_RNA < 1500000 & meta_info$nCount_RNA > 500000) |
+         (meta_info$rep=='rep2' & meta_info$celltype=='CD69posDP' & meta_info$nCount_RNA < 1500000 & meta_info$nCount_RNA > 750000) |
+         (meta_info$rep=='rep2' & meta_info$celltype!='CD69posDP' & meta_info$nCount_RNA < 1500000 & meta_info$nCount_RNA > 500000) 
+                ,]))
+
+
+# CD4_8low <- subset(Rep1_filtered_rep2, cells = rownames(meta_info[meta_info$celltype=='CD4+8low',]))
+# CD69negDP <- subset(Rep1_filtered_rep2, cells = rownames(meta_info[meta_info$celltype=='CD69negDP',]))
+# CD4SP_Mature <- subset(Rep1_filtered_rep2, cells = rownames(meta_info[meta_info$celltype=='CD4SP_Mature',]))
+# CD4SP_Immature <- subset(Rep1_filtered_rep2, cells = rownames(meta_info[meta_info$celltype=='CD4SP_Immature',]))
+# 
+# DimPlot(CD4_8low, reduction = "pca", group.by = "rep", cols=c('red','blue','green'))+xlim(-10,15)+ylim(-10,10)+ggtitle('CD4+8low')
+# DimPlot(CD69negDP, reduction = "pca", group.by = "rep", cols=c('red','blue','green'))+xlim(-10,15)+ylim(-10,10)+ggtitle('CD69negDP')
+# DimPlot(CD4SP_Mature, reduction = "pca", group.by = "rep", cols=c('red','blue','green'))+xlim(-10,15)+ylim(-10,10)+ggtitle('CD4SP_Mature')
+# DimPlot(CD4SP_Immature, reduction = "pca", group.by = "rep", cols=c('red','blue','green'))+xlim(-10,15)+ylim(-10,10)+ggtitle('CD4SP_Immature')
+# 
+# 
+# DimPlot(CD4_8low, reduction = "pca", group.by = "rep", cols=c('red','blue','green'), dims = c(1, 3))+xlim(-10,15)+ylim(-10,10)+ggtitle('CD4+8low')
+# DimPlot(CD69negDP, reduction = "pca", group.by = "rep", cols=c('red','blue','green'), dims = c(1, 3))+xlim(-10,15)+ylim(-10,10)+ggtitle('CD69negDP')
+# DimPlot(CD4SP_Mature, reduction = "pca", group.by = "rep", cols=c('red','blue','green'), dims = c(1, 3))+xlim(-10,15)+ylim(-10,10)+ggtitle('CD4SP_Mature')
+# DimPlot(CD4SP_Immature, reduction = "pca", group.by = "rep", cols=c('red','blue','green'), dims = c(1, 3))+xlim(-10,15)+ylim(-10,10)+ggtitle('CD4SP_Immature')
+
+meta_info_new <- Rep1_filtered_rep2@meta.data
+PCA <- as.data.frame(Rep1_filtered_rep2@reductions$pca@cell.embeddings)
+rownames(PCA) <-  rownames(Rep1_filtered_rep2@reductions$pca@cell.embeddings)
+
+meta_info_new$PC_1 <- PCA$PC_1
+meta_info_new$PC_2 <- PCA$PC_2
+meta_info_new$PC_3 <- PCA$PC_3
+
+meta_info_new[meta_info_new$celltype=='CD4+8low' & meta_info_new$PC_2 < meta_info_new$PC_1,'celltype'] <- 'CD4SP_Immature'
+
+meta_info[rownames(meta_info_new),'celltype'] <- meta_info_new$celltype
+
+```
+
+
+## Sep Figure 3.e
+
+```{r,echo=T, eval=T, cache=T, message=F, warning=FALSE, fig.width=5, fig.height=5}
+
+gene_set <- read.csv(file="/Volumes/bioinfomatics$/Mehdi/Matthias/scRNA-seq/scRNAseq_CRG_02012020/gene_set/DE_gene_drodeRes_rep2_fset.csv", header=FALSE, sep=",")
+
+emat <- cbind(emat_rep1,emat_rep2)
+nmat <- cbind(nmat_rep1,nmat_rep2)
+smat <- cbind(smat_rep1,smat_rep2)
+# meta_info <- rbind(merged_meta,meta_data)
+
+emat <- emat[intersect(gene_set$V1,rownames(emat)),]
+emat <- emat[!(rownames(emat) =='Cd4' | rownames(emat) == 'Cd8a' | rownames(emat) =='Cd8b1'),]
+
+# gene_set <- gene_set[!(gene_set$V1 =='Cd4' | gene_set$V1 =='Cd8a' | gene_set$V1 =='Cd8b1'),] 
+
+###########
+#Running Seurat 
+###########
+
+WT_Thymocye <- CreateSeuratObject(emat, meta.data = meta_info)
+WT_Thymocye.list <- SplitObject(WT_Thymocye, split.by = "rep")
+
+for (i in 1:length(WT_Thymocye.list)) {
+    WT_Thymocye.list[[i]] <- NormalizeData(WT_Thymocye.list[[i]], verbose = FALSE)
+    WT_Thymocye.list[[i]] <- FindVariableFeatures(WT_Thymocye.list[[i]], selection.method = "vst", 
+        nfeatures = 2000, verbose = FALSE)
+}
+
+reference.list <- WT_Thymocye.list[c("rep1", "rep2", "rep2_KO")]
+WT_Thymocye.anchors <- FindIntegrationAnchors(object.list = reference.list, dims = 1:30)
+
+WT_Thymocye.integrated <- IntegrateData(anchorset = WT_Thymocye.anchors, dims = 1:30)
+
+
+library(ggplot2)
+library(cowplot)
+# switch to integrated assay. The variable features of this assay are automatically
+# set during IntegrateData
+DefaultAssay(WT_Thymocye.integrated) <- "integrated"
+
+# Run the standard workflow for visualization and clustering
+WT_Thymocye.integrated <- ScaleData(WT_Thymocye.integrated, verbose = FALSE)
+WT_Thymocye.integrated <- RunPCA(WT_Thymocye.integrated, npcs = 30, verbose = FALSE)
+WT_Thymocye.integrated <- RunUMAP(WT_Thymocye.integrated, reduction = "pca", dims = 1:30)
+
+PCA <- as.data.frame(WT_Thymocye.integrated@reductions$pca@cell.embeddings)
+
+
+
+# Original runing 
+emat <- cbind(emat_rep1,emat_rep2)
+nmat <- cbind(nmat_rep1,nmat_rep2)
+smat <- cbind(smat_rep1,smat_rep2)
+
+###########
+#Running Seurat 
+###########
+
+WT_Thymocye <- CreateSeuratObject(emat, meta.data = meta_info)
+WT_Thymocye.list <- SplitObject(WT_Thymocye, split.by = "rep")
+
+for (i in 1:length(WT_Thymocye.list)) {
+    WT_Thymocye.list[[i]] <- NormalizeData(WT_Thymocye.list[[i]], verbose = FALSE)
+    WT_Thymocye.list[[i]] <- FindVariableFeatures(WT_Thymocye.list[[i]], selection.method = "vst", 
+        nfeatures = 5000, verbose = FALSE)
+}
+
+reference.list <- WT_Thymocye.list[c("rep1", "rep2", "rep2_KO")]
+WT_Thymocye.anchors <- FindIntegrationAnchors(object.list = reference.list, dims = 1:30)
+
+WT_Thymocye.integrated <- IntegrateData(anchorset = WT_Thymocye.anchors, dims = 1:30)
+
+
+library(ggplot2)
+library(cowplot)
+# switch to integrated assay. The variable features of this assay are automatically
+# set during IntegrateData
+DefaultAssay(WT_Thymocye.integrated) <- "integrated"
+
+WT_Thymocye.integrated <- ScaleData(WT_Thymocye.integrated, verbose = FALSE)
+WT_Thymocye.integrated <- RunPCA(WT_Thymocye.integrated, npcs = 30, verbose = FALSE)
+WT_Thymocye.integrated <- RunUMAP(WT_Thymocye.integrated, reduction = "pca", dims = 1:30)
+
+
+WT_Thymocye.integrated@reductions$pca@cell.embeddings <-  as.matrix(PCA)
+
+draw_ScatterPlot <-  function(data_scatter_new, pair, celltype){
+sp <- ggscatter(data_scatter_new, x = pair[1], y = pair[2],
+   conf.int = TRUE # Add confidence interval
+   ) + stat_cor(method = "pearson")+ stat_cor(method = "pearson")+theme(plot.title = element_text(size = 12, face = "bold"),
+    legend.title=element_text(size=8), 
+    legend.text=element_text(size=8))+ggtitle(celltype)
+print(sp)}
+
+####
+Rep1_filtered_rep2 <- subset(WT_Thymocye.integrated, cells = rownames(meta_info[meta_info$Zbtb7b.Runx3.=="Zbtb7b+Runx3+" &
+         ((meta_info$rep=='rep2' & meta_info$celltype=='CD69posDP' & meta_info$nCount_RNA < 1500000 & meta_info$nCount_RNA > 750000) |
+         (meta_info$rep=='rep2' & meta_info$celltype!='CD69posDP' & meta_info$nCount_RNA < 1500000 & meta_info$nCount_RNA > 500000)) 
+                ,]))
+
+DefaultAssay(Rep1_filtered_rep2) <- "RNA"
+data_scatter <- as.data.frame(t(GetAssayData(Rep1_filtered_rep2,slot='data',assay = "RNA")))
+draw_ScatterPlot(data_scatter, c("Cd4","Cd8a"), 'Zbtb7b+Runx3+')
+####
+
+
+
+```
+
+
+
+## Session Info
+
+```{r Session, eval=T, echo=T}
+sessionInfo()
+
+```
+

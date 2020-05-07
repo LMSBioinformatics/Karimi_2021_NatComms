@@ -124,9 +124,14 @@ velocyto run_smartseq2 \
 > g - Refer [Figure7g.Rmd](Figure7g.Rmd) and [Figure7g.html](Figure7g.html)
 
 
+------------
+
 #### Identifying gene sets - F-set
 
 > Refer the R script - [F-set_identification.R](F-set_identification.R)
+
+
+------------
 
 #### Supplementary Analysis and figures
 
@@ -134,12 +139,34 @@ velocyto run_smartseq2 \
 
 > a - Refer [Figure4_SupFigure2a_SupFigure5.Rmd](Figure4_SupFigure2a_SupFigure5.Rmd) and [Figure4_SupFigure2a_SupFigure5.html](Figure4_SupFigure2a_SupFigure5.html)
 
-> b, c, d and e - Refer [Figure2_Figure6ab_SupFigure2bcde.Rmd](Figure2_Figure6ab_SupFigure2bcde.Rmd) and [Figure2_Figure6ab_SupFigure2bcde.html](Figure2_Figure6ab_SupFigure2bcde.html)
+> b to e - Refer [Figure2_Figure6ab_SupFigure2bcde.Rmd](Figure2_Figure6ab_SupFigure2bcde.Rmd) and [Figure2_Figure6ab_SupFigure2bcde.html](Figure2_Figure6ab_SupFigure2bcde.html)
+
+
+#### Supplementary Figure 3: Co-expression of Zbtb7 and Runx3
+
+> a to e - Refer [SupFigure3abcde_SupFigure8.Rmd](SupFigure3abcde_SupFigure8.Rmd) and [SupFigure3abcde_SupFigure8.html](SupFigure3abcde_SupFigure8.html)
+
+> e - Also refer [SupFigure3e.Rmd](SupFigure3e.Rmd) and [SupFigure3e.html](SupFigure3e.html)
+
+> f - Refer [SupFigure3f.Rmd](SupFigure3f.Rmd) and [SupFigure3f.html](SupFigure3f.html)
+
 
 
 #### Supplementary Figure 5: Gene expression by individual selection intermediates in MHC class II-/- thymus.  
 
 > a - Refer [Figure4_SupFigure2a_SupFigure5.Rmd](Figure4_SupFigure2a_SupFigure5.Rmd) and [Figure4_SupFigure2a_SupFigure5.html](Figure4_SupFigure2a_SupFigure5.html)
+
+
+#### Supplementary Figure 6: Details on gene expression programs associated with distinct patterns of co-receptor activity in selection intermediates
+
+> a to f - Refer [SupFigure6.Rmd](SupFigure6.Rmd) and [SupFigure6.html](SupFigure6.html)
+
+
+
+#### Supplementary Figure 8. Expression of activation versus lineage markers
+
+> a and b - Refer [SupFigure3abcde_SupFigure8.Rmd](SupFigure3abcde_SupFigure8.Rmd) and [SupFigure3abcde_SupFigure8.html](SupFigure3abcde_SupFigure8.html)
+
 
 
 #### Supplementary Figure 9. The temporal sequence of pre- and post-selection MHC class II-/- thymocytes and selection intermediates
@@ -150,8 +177,15 @@ velocyto run_smartseq2 \
 > c - Refer [Figure5be_SupFigure9c_SupFigure11.Rmd](Figure5be_SupFigure9c_SupFigure11.Rmd) and [Figure5be_SupFigure9c_SupFigure11.html](Figure5be_SupFigure9c_SupFigure11.html)
 
 
+
 #### Supplementary Figure 11. Cd4+ Cd8a- selection intermediates with NKT-like gene expression do not account for the timing of co-receptor gene expression patterns in the MHC class II-/- thymus
 
 > a and b - Refer [Figure5be_SupFigure9c_SupFigure11.Rmd](Figure5be_SupFigure9c_SupFigure11.Rmd) and [Figure5be_SupFigure9c_SupFigure11.html](Figure5be_SupFigure9c_SupFigure11.html)
 
 >Also, refer [SupFigure11.Rmd](SupFigure11.Rmd) and [SupFigure11.html](SupFigure11.html)
+
+
+
+
+------------
+------------
