@@ -1,6 +1,10 @@
 # ScRNAseq-SMARTer-Analysis
 
-This repository contains scripts used in the analysis of single-cell RNA-seq data generated using Smart-seq2 and SMARTer protocols from mouse thymocytes to study the order and logic of CD4 CD8 lineage choice and differentiation.
+This repository contains scripts used in the analysis of single-cell RNA-seq data generated using Smart-seq2 and SMARTer protocols from mouse thymocytes to study the order and logic of CD4 CD8 lineage choice and differentiation. The scripts in this repository are from the study -
+
+
+Karimi, M. M., Guo, Y., Cui, X., Pallikonda, H. A., Horková, V., Wang, Y., . . . Merkenschlager, M. (2021). The order and logic of CD4 versus CD8 lineage choice and differentiation in mouse thymus. Nature Communications, 12(1). [doi:10.1038/s41467-020-20306-w](https://doi.org/10.1038/s41467-020-20306-w)
+
 
 
 - [Alignment](#alignment)
